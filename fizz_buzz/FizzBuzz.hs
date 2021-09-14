@@ -1,9 +1,7 @@
 module Main where 
 
 main :: IO () 
-main = do
-        input <- getLine
-        putStrLn $ compute input
+main = (compute <$> getLine) >>= putStrLn 
 
 compute :: String -> String
 compute s = let fold = \i -> foldr fizzBuzz [] i
