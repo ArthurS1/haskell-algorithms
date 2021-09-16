@@ -1,18 +1,26 @@
 module Main where 
 
-main :: IO () 
-main = (compute <$> getLine) >>= putStrLn 
+import Text.Read
+import System.IO
 
-compute :: String -> String
-compute s = let fold = \i -> foldr fizzBuzz [] i
-            in unwords $ fold $ parse s
+main :: IO ()
+main = (compute <$> getLine) >>= output 
 
-parse :: String -> [Int]
-parse s = map read $ words s :: [Int]
+output :: Maybe String -> IO () 
+output (Just s) = hPutStrLn stdout s
+output Nothing = hPutStrLn stderr "error"
 
-fizzBuzz :: Int -> [String] -> [String]
-fizzBuzz e acc
-    | mod e 3 == 0 = "Fizz":acc
-    | mod e 5 == 0 = "Buzz":acc
-    | mod e 5 == 0 && mod e 3 == 0 = "Fizz":"Buzz":acc
-    | otherwise = show e:acc
+compute :: String -> Maybe String
+compute s = let fold = \i -> foldr fizzBuzz (Just []) i
+            in unwords <$> (fold $ parse s)
+
+parse :: String -> [Maybe Int]
+parse s = map readMaybe $ words s :: [Maybe Int]
+
+fizzBuzz :: Maybe Int -> Maybe [String] -> Maybe [String]
+fizzBuzz (Just e) (Just acc)
+    | mod e 3 == 0 = Just $ "Fizz":acc
+    | mod e 5 == 0 = Just $ "Buzz":acc
+    | mod e 5 == 0 && mod e 3 == 0 = Just $ "Fizz":"Buzz":acc
+    | otherwise = Just $ show e:acc
+fizzBuzz _ _ = Nothing
